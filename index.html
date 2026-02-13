@@ -8,293 +8,302 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-gray-100 min-h-screen">
-  <div class="max-w-4xl mx-auto p-6">
-    <h1 class="text-4xl font-bold text-gray-800 mb-8 text-center">⏰ Time Clock</h1>
+  <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+      <h1 class="text-3xl font-bold text-gray-800 text-center mb-8">Time Clock</h1>
+      <div id="loginForm">
+        <input type="text" id="username" placeholder="Username" class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl mb-4 focus:border-blue-500">
+        <input type="password" id="password" placeholder="Password" class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl mb-6 focus:border-blue-500">
+        <button onclick="login()" class="w-full py-3 bg-blue-500 text-white text-lg font-bold rounded-xl">Sign In</button>
+        <p id="loginError" class="text-red-500 text-center mt-4 hidden"></p>
+      </div>
+      <div class="mt-6 text-center">
+        <button onclick="showRegister()" class="text-blue-500">Register</button>
+      </div>
+      <div id="registerForm" class="hidden">
+        <input type="text" id="regUsername" placeholder="Username" class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl mb-4">
+        <input type="password" id="regPassword" placeholder="Password" class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl mb-4">
+        <input type="text" id="regName" placeholder="Full Name" class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl mb-6">
+        <button onclick="register()" class="w-full py-3 bg-green-500 text-white text-lg font-bold rounded-xl">Register</button>
+        <p id="regError" class="text-red-500 text-center mt-4 hidden"></p>
+        <button onclick="showLogin()" class="w-full mt-4 text-gray-500">Back</button>
+      </div>
+    </div>
+  </div>
 
-    <!-- Clock In/Out Section -->
-    <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
-      <div class="flex flex-col sm:flex-row gap-4 items-center justify-center">
-        <input
-          type="text"
-          id="employeeName"
-          placeholder="Enter your name"
-          class="flex-1 px-6 py-4 border-2 border-gray-300 rounded-xl text-xl focus:border-blue-500 focus:outline-none"
-        >
-        
-        <button
-          id="clockBtn"
-          onclick="handleClock()"
-          class="px-10 py-4 bg-green-500 hover:bg-green-600 text-white text-xl font-bold rounded-xl transition-all transform hover:scale-105"
-        >
-          ▶️ Clock In
-        </button>
+  <div id="appScreen" class="hidden">
+    <div class="max-w-4xl mx-auto p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold">Time Clock</h1>
+        <div><span id="userDisplay" class="mr-3"></span><button onclick="logout()" class="text-red-500">Logout</button></div>
+      </div>
+      <div class="flex gap-2 mb-6">
+        <button onclick="showView('clock')" class="nav-btn px-4 py-2 bg-blue-500 text-white rounded-lg">Clock</button>
+        <button onclick="showView('schedule')" class="nav-btn px-4 py-2 bg-gray-200 rounded-lg">Schedule</button>
+        <button onclick="showView('requests')" class="nav-btn px-4 py-2 bg-gray-200 rounded-lg">Requests</button>
+        <button onclick="showView('reports')" class="nav-btn px-4 py-2 bg-gray-200 rounded-lg">Reports</button>
       </div>
 
-      <div id="status" class="mt-6 text-center hidden">
-        <div class="inline-block px-6 py-3 rounded-lg text-lg font-medium"></div>
+      <div id="view-clock" class="view">
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-6 text-center">
+          <div id="statusBadge" class="inline-block px-6 py-3 rounded-lg text-lg font-medium mb-4 bg-gray-100">Not Clocked In</div>
+          <div id="timerDisplay" class="hidden mb-4">
+            <p id="sessionType" class="text-gray-500">Working</p>
+            <p id="timer" class="text-6xl font-bold text-blue-600">00:00:00</p>
+          </div>
+          <button id="clockBtn" onclick="handleClock()" class="px-8 py-4 bg-green-500 text-white text-xl font-bold rounded-xl">Clock In</button>
+          <button id="breakBtn" onclick="toggleBreak()" class="hidden px-6 py-4 bg-yellow-500 text-white rounded-xl ml-2">Take Break</button>
+        </div>
+        <div class="grid grid-cols-3 gap-4 mb-6">
+          <div class="bg-white rounded-xl shadow p-4 text-center"><p class="text-2xl font-bold text-blue-600" id="myTodayHours">0h 0m</p><p class="text-gray-500">Today</p></div>
+          <div class="bg-white rounded-xl shadow p-4 text-center"><p class="text-2xl font-bold text-purple-600" id="myWeekHours">0h 0m</p><p class="text-gray-500">Week</p></div>
+          <div class="bg-white rounded-xl shadow p-4 text-center"><p class="text-2xl font-bold text-orange-600" id="myMonthHours">0h 0m</p><p class="text-gray-500">Period</p></div>
+        </div>
+        <div class="bg-white rounded-xl shadow"><div class="px-6 py-4 bg-gray-50 border-b">My Entries</div><div id="myEntries" class="divide-y max-h-64 overflow-y-auto"></div></div>
       </div>
 
-      <!-- Current Timer -->
-      <div id="currentSession" class="mt-6 text-center hidden">
-        <div class="bg-blue-50 rounded-xl p-6">
-          <p class="text-gray-600 mb-2">Current Session</p>
-          <p id="timer" class="text-5xl font-bold text-blue-600">00:00:00</p>
+      <div id="view-schedule" class="view hidden">
+        <div class="bg-white rounded-xl shadow p-6 mb-6">
+          <h2 class="text-xl font-semibold mb-4">Weekly Schedule</h2>
+          <div class="flex justify-between mb-4"><button onclick="changeWeek(-1)" class="px-3 bg-gray-200 rounded"><</button><span id="weekRange">This Week</span><button onclick="changeWeek(1)" class="px-3 bg-gray-200 rounded">></button></div>
+          <div id="scheduleGrid" class="grid grid-cols-7 gap-2"></div>
+        </div>
+        <div class="bg-white rounded-xl shadow p-6">
+          <h2 class="text-xl font-semibold mb-4">Time Off Request</h2>
+          <div class="flex gap-4 mb-4">
+            <input type="date" id="requestDate" class="border rounded px-3 py-2">
+            <select id="requestType" class="border rounded px-3 py-2">
+              <option value="vacation">Vacation</option>
+              <option value="sick">Sick Day</option>
+              <option value="personal">Personal</option>
+            </select>
+            <button onclick="submitRequest()" class="px-4 py-2 bg-blue-500 text-white rounded">Submit</button>
+          </div>
+          <div id="myRequests" class="divide-y"></div>
         </div>
       </div>
-    </div>
 
-    <!-- Stats -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
-      <div class="bg-white rounded-xl shadow p-6 text-center">
-        <h3 class="text-lg font-semibold text-gray-600 mb-2">📅 Today</h3>
-        <p id="todayTotal" class="text-4xl font-bold text-blue-600">0h 0m</p>
+      <div id="view-requests" class="view hidden">
+        <div class="bg-white rounded-xl shadow p-6 mb-6">
+          <h2 class="text-xl font-semibold mb-4">Pending Requests</h2>
+          <div id="pendingRequests"></div>
+        </div>
+        <div class="bg-white rounded-xl shadow p-6">
+          <h2 class="text-xl font-semibold mb-4">History</h2>
+          <div id="requestHistory"></div>
+        </div>
       </div>
-      <div class="bg-white rounded-xl shadow p-6 text-center">
-        <h3 class="text-lg font-semibold text-gray-600 mb-2">📆 This Week</h3>
-        <p id="weekTotal" class="text-4xl font-bold text-purple-600">0h 0m</p>
-      </div>
-    </div>
 
-    <!-- Entries -->
-    <div class="bg-white rounded-xl shadow overflow-hidden">
-      <div class="px-6 py-4 bg-gray-50 border-b">
-        <h2 class="text-xl font-semibold">Recent Entries</h2>
-      </div>
-      
-      <div id="entries" class="divide-y divide-gray-200 max-h-96 overflow-y-auto">
-        <div class="p-8 text-center text-gray-500">Loading...</div>
+      <div id="view-reports" class="view hidden">
+        <div class="bg-white rounded-xl shadow p-6">
+          <h2 class="text-xl font-semibold mb-4">Hours Report</h2>
+          <div class="flex gap-4 mb-4">
+            <select id="reportPeriod" class="border rounded px-3 py-2">
+              <option value="week">This Week</option>
+              <option value="month">This Month</option>
+            </select>
+            <button onclick="loadReport()" class="px-4 py-2 bg-blue-500 text-white rounded">Generate</button>
+            <button onclick="exportCSV()" class="px-4 py-2 bg-green-500 text-white rounded">Export CSV</button>
+          </div>
+          <table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-2 text-left">Employee</th><th class="px-4 py-2 text-right">Hours</th><th class="px-4 py-2 text-right">Breaks</th></tr></thead><tbody id="reportBody"></tbody></table>
+        </div>
       </div>
     </div>
   </div>
 
   <script>
-    const SUPABASE_URL = 'https://xybsaxjbtbpxpqwpbvmm.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5YnNheGpidGJweHBxd3Bidm1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4MzMyMjAsImV4cCI6MjA4NjQwOTIyMH0.0tNbX0yGx8BTM67aGDWObj21JG_rfMJ6jOKIIS6uYsE';
+const SUPABASE_URL = 'https://xybsaxjbtbpxpqwpbvmm.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5YnNheGpidGJweHBxd3Bidm1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4MzMyMjAsImV4cCI6MjA4NjQwOTIyMH0.0tNbX0yGx8BTM67aGDWObj21JG_rfMJ6jOKIIS6uYsE';
 
-    let currentEntry = null;
-    let timerInterval = null;
+let currentUser = null, currentEntry = null, timerInterval = null, weekOffset = 0, reportData = [];
 
-    // Load saved name
-    const savedName = localStorage.getItem('employeeName');
-    if (savedName) {
-      document.getElementById('employeeName').value = savedName;
-    }
+const savedUser = localStorage.getItem('timeclock_user');
+if (savedUser) { currentUser = JSON.parse(savedUser); showApp(); }
 
-    // Check clock status on load
-    checkClockStatus();
-    fetchEntries();
+function showLogin() { document.getElementById('loginScreen').classList.remove('hidden'); document.getElementById('appScreen').classList.add('hidden'); }
+function showRegister() { document.getElementById('loginForm').classList.add('hidden'); document.getElementById('registerForm').classList.remove('hidden'); }
 
-    async function checkClockStatus() {
-      const name = document.getElementById('employeeName').value;
-      if (!name) return;
+async function login() {
+  const u = document.getElementById('username').value.trim();
+  const p = document.getElementById('password').value;
+  if (!u || !p) return showError('Enter username and password');
+  const data = await supabaseFetch('users?username=eq.' + encodeURIComponent(u) + '&password=eq.' + encodeURIComponent(p) + '&limit=1');
+  if (!data || data.length === 0) return showError('Invalid credentials');
+  currentUser = data[0]; localStorage.setItem('timeclock_user', JSON.stringify(currentUser)); showApp();
+}
 
-      const { data } = await supabaseFetch(
-        `time_entries?employee_name=eq.${encodeURIComponent(name)}&clock_out=is.null&order=clock_in.desc&limit=1`
-      );
+async function register() {
+  const u = document.getElementById('regUsername').value.trim();
+  const p = document.getElementById('regPassword').value;
+  const n = document.getElementById('regName').value.trim();
+  if (!u || !p || !n) return showRegError('Fill all fields');
+  const existing = await supabaseFetch('users?username=eq.' + encodeURIComponent(u) + '&limit=1');
+  if (existing && existing.length > 0) return showRegError('Username taken');
+  await supabasePost('users', { username: u, password: p, name: n, role: 'employee' });
+  currentUser = { username: u, name: n, role: 'employee' }; localStorage.setItem('timeclock_user', JSON.stringify(currentUser)); showApp();
+}
 
-      if (data && data.length > 0) {
-        currentEntry = data[0];
-        updateClockButton(true);
-        startTimer(currentEntry.clock_in);
-      }
-    }
+function logout() { localStorage.removeItem('timeclock_user'); currentUser = null; stopTimer(); showLogin(); }
+function showError(msg) { document.getElementById('loginError').textContent = msg; document.getElementById('loginError').classList.remove('hidden'); }
+function showRegError(msg) { document.getElementById('regError').textContent = msg; document.getElementById('regError').classList.remove('hidden'); }
 
-    async function handleClock() {
-      const name = document.getElementById('employeeName').value.trim();
-      if (!name) {
-        alert('Please enter your name');
-        return;
-      }
+function showApp() {
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('appScreen').classList.remove('hidden');
+  document.getElementById('userDisplay').textContent = currentUser.name;
+  showView('clock');
+}
 
-      localStorage.setItem('employeeName', name);
+function showView(viewName) {
+  document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+  document.getElementById('view-' + viewName).classList.remove('hidden');
+  document.querySelectorAll('.nav-btn').forEach(btn => btn.className = 'nav-btn px-4 py-2 ' + (btn.textContent.toLowerCase().includes(viewName) ? 'bg-blue-500 text-white rounded-lg' : 'bg-gray-200 rounded-lg'));
+  if (viewName === 'clock') loadTimeClock();
+  if (viewName === 'schedule') loadSchedule();
+  if (viewName === 'requests') loadRequests();
+  if (viewName === 'reports') loadReport();
+}
 
-      if (currentEntry) {
-        // Clock out
-        await supabasePatch(`time_entries?id=eq.${currentEntry.id}`, {
-          clock_out: new Date().toISOString()
-        });
-        currentEntry = null;
-        stopTimer();
-        updateClockButton(false);
-      } else {
-        // Clock in
-        const { data } = await supabasePost('time_entries', {
-          employee_name: name,
-          clock_in: new Date().toISOString()
-        });
-        if (data) {
-          currentEntry = data[0];
-          updateClockButton(true);
-          startTimer(currentEntry.clock_in);
-        }
-      }
+async function loadTimeClock() {
+  const { data } = await supabaseFetch('time_entries?user_id=eq.' + currentUser.id + '&clock_out=is.null&order=clock_in.desc&limit=1');
+  if (data && data.length > 0) { currentEntry = data[0]; updateClockUI(true, currentEntry.is_break); startTimer(currentEntry.clock_in); }
+  else updateClockUI(false, false);
+  
+  const today = new Date(); today.setHours(0,0,0,0);
+  const weekStart = new Date(today); weekStart.setDate(today.getDate() - today.getDay() + (today.getDay()===0?-6:1)); weekStart.setHours(0,0,0,0);
+  const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+  
+  const [tD, wD, mD] = await Promise.all([
+    supabaseFetch('time_entries?user_id=eq.' + currentUser.id + '&clock_in=gte.' + today.toISOString()),
+    supabaseFetch('time_entries?user_id=eq.' + currentUser.id + '&clock_in=gte.' + weekStart.toISOString()),
+    supabaseFetch('time_entries?user_id=eq.' + currentUser.id + '&clock_in=gte.' + monthStart.toISOString())
+  ]);
+  document.getElementById('myTodayHours').innerHTML = calcHours(tD||[]);
+  document.getElementById('myWeekHours').innerHTML = calcHours(wD||[]);
+  document.getElementById('myMonthHours').innerHTML = calcHours(mD||[]);
+  document.getElementById('myEntries').innerHTML = (wD||[]).map(e => { 
+    const d = e.clock_out ? new Date(e.clock_out)-new Date(e.clock_in) : new Date()-new Date(e.clock_in); 
+    return '<div class="p-3 flex justify-between"><div><p class="font-medium">' + (e.is_break?'Break':'Work') + '</p><p class="text-sm text-gray-500">' + formatDate(e.clock_in) + '</p></div><span>' + formatDuration(d) + '</span></div>'; 
+  }).join('')||'<p class="p-4 text-gray-500">No entries</p>';
+}
 
-      fetchEntries();
-    }
+async function handleClock() {
+  if (currentEntry) { 
+    await supabasePatch('time_entries?id=eq.' + currentEntry.id, {clock_out: new Date().toISOString()}); 
+    currentEntry = null; stopTimer(); updateClockUI(false,false); 
+  } else { 
+    const { data } = await supabasePost('time_entries', {user_id: currentUser.id, employee_name: currentUser.name, clock_in: new Date().toISOString(), is_break: false}); 
+    if(data&&data[0]){ currentEntry=data[0]; updateClockUI(true,false); startTimer(currentEntry.clock_in); } 
+  }
+  loadTimeClock();
+}
 
-    function updateClockButton(clockedIn) {
-      const btn = document.getElementById('clockBtn');
-      const status = document.getElementById('status');
-      const currentSession = document.getElementById('currentSession');
-      const nameInput = document.getElementById('employeeName');
+async function toggleBreak() {
+  if (!currentEntry) return;
+  await supabasePatch('time_entries?id=eq.' + currentEntry.id, {clock_out: new Date().toISOString()});
+  const isEnding = currentEntry.is_break;
+  const { data } = await supabasePost('time_entries', {user_id: currentUser.id, employee_name: currentUser.name, clock_in: new Date().toISOString(), is_break: !isEnding});
+  if(data&&data[0]){ currentEntry=data[0]; updateClockUI(true,!isEnding); startTimer(currentEntry.clock_in); }
+  loadTimeClock();
+}
 
-      if (clockedIn) {
-        btn.innerHTML = '🛑 Clock Out';
-        btn.className = 'px-10 py-4 bg-red-500 hover:bg-red-600 text-white text-xl font-bold rounded-xl transition-all transform hover:scale-105';
-        status.querySelector('div').className = 'inline-block px-6 py-3 rounded-lg text-lg font-medium bg-green-100 text-green-800';
-        status.querySelector('div').innerHTML = '🟢 Clocked In';
-        status.classList.remove('hidden');
-        currentSession.classList.remove('hidden');
-        nameInput.disabled = true;
-      } else {
-        btn.innerHTML = '▶️ Clock In';
-        btn.className = 'px-10 py-4 bg-green-500 hover:bg-green-600 text-white text-xl font-bold rounded-xl transition-all transform hover:scale-105';
-        status.classList.add('hidden');
-        currentSession.classList.add('hidden');
-        nameInput.disabled = false;
-      }
-    }
+function updateClockUI(clocked, isBreak) {
+  const badge = document.getElementById('statusBadge'), timer = document.getElementById('timerDisplay'), btn = document.getElementById('clockBtn'), breakBtn = document.getElementById('breakBtn');
+  if (clocked) {
+    if (isBreak) { badge.textContent='On Break'; badge.className='inline-block px-6 py-3 rounded-lg bg-yellow-100 mb-4'; btn.textContent='End Break'; btn.className='px-8 py-4 bg-orange-500 text-white rounded-xl'; breakBtn.classList.add('hidden'); }
+    else { badge.textContent='Working'; badge.className='inline-block px-6 py-3 rounded-lg bg-green-100 mb-4'; btn.textContent='Clock Out'; btn.className='px-8 py-4 bg-red-500 text-white rounded-xl'; breakBtn.classList.remove('hidden'); }
+    document.getElementById('sessionType').textContent = isBreak ? 'On Break' : 'Working';
+    timer.classList.remove('hidden');
+  } else { badge.textContent='Not Clocked In'; badge.className='inline-block px-6 py-3 rounded-lg bg-gray-100 mb-4'; timer.classList.add('hidden'); btn.textContent='Clock In'; btn.className='px-8 py-4 bg-green-500 text-white rounded-xl'; breakBtn.classList.add('hidden'); }
+}
 
-    function startTimer(clockIn) {
-      const start = new Date(clockIn);
-      
-      function update() {
-        const now = new Date();
-        const diff = now - start;
-        const hours = Math.floor(diff / (1000 * 60 * 60));
-        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const secs = Math.floor((diff % (1000 * 60)) / 1000);
-        document.getElementById('timer').textContent = 
-          `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-      }
-      
-      update();
-      timerInterval = setInterval(update, 1000);
-    }
+function startTimer(clockIn) {
+  const start = new Date(clockIn);
+  function u() { const diff=new Date()-start, h=Math.floor(diff/3600000), m=Math.floor((diff%3600000)/60000), s=Math.floor((diff%60000)/1000); document.getElementById('timer').textContent = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0'); }
+  u(); timerInterval = setInterval(u, 1000);
+}
+function stopTimer() { if(timerInterval) clearInterval(timerInterval); }
+function calcHours(entries) { let w=0,b=0; entries.forEach(e => { if(e.clock_out){ const ms = new Date(e.clock_out)-new Date(e.clock_in); if(e.is_break)b+=ms; else w+=ms; }}); return formatHours(w) + '<span class="text-xs text-gray-400">(' + formatHours(b) + ')</span>'; }
 
-    function stopTimer() {
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-      }
-    }
+function changeWeek(d) { weekOffset += d; loadSchedule(); }
+async function loadSchedule() {
+  const today = new Date(), ws = new Date(today); ws.setDate(today.getDate() - today.getDay() + weekOffset*7); ws.setHours(0,0,0,0);
+  const we = new Date(ws); we.setDate(ws.getDate() + 6);
+  document.getElementById('weekRange').textContent = ws.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' - ' + we.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  const entries = await supabaseFetch('time_entries?clock_in=gte.' + ws.toISOString() + '&clock_in=lte.' + we.toISOString());
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  document.getElementById('scheduleGrid').innerHTML = days.map((d,i) => { 
+    const dt = new Date(ws); dt.setDate(ws.getDate()+i); 
+    const dayEntries = (entries||[]).filter(e => new Date(e.clock_in).toDateString() === dt.toDateString()); 
+    return '<div class="p-2 bg-gray-50 rounded text-center"><p class="font-medium text-sm">' + d + '</p><p class="text-xs text-gray-500">' + dt.getDate() + '</p><div class="mt-1">' + (dayEntries.length?dayEntries.map(e=>'<div class="text-xs ' + (e.is_break?'text-yellow-600':'text-green-600') + '">' + formatTime(e.clock_in) + '</div>').join(''):'<span class="text-gray-300">-</span>') + '</div></div>'; 
+  }).join('');
+  loadMyRequests();
+}
 
-    async function fetchEntries() {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+async function submitRequest() {
+  const date = document.getElementById('requestDate').value;
+  const type = document.getElementById('requestType').value;
+  if(!date) return alert('Select date');
+  await supabasePost('time_requests', {user_id: currentUser.id, employee_name: currentUser.name, request_date: date, request_type: type, status: 'pending'});
+  alert('Request submitted!'); loadMyRequests();
+}
 
-      const weekStart = new Date(today);
-      weekStart.setDate(today.getDate() - today.getDay());
+async function loadMyRequests() {
+  const requests = await supabaseFetch('time_requests?user_id=eq.' + currentUser.id + '&order=created_at.desc');
+  document.getElementById('myRequests').innerHTML = (requests||[]).length ? requests.map(r => '<div class="py-2 flex justify-between"><div><p class="font-medium">' + r.request_type + '</p><p class="text-sm text-gray-500">' + r.request_date + '</p></div><span class="px-2 py-1 rounded text-sm ' + (r.status==='pending'?'bg-yellow-100':r.status==='approved'?'bg-green-100':'bg-red-100') + '">' + r.status + '</span></div>').join('') : '<p class="text-gray-500">No requests</p>';
+}
 
-      const [todayData, weekData] = await Promise.all([
-        supabaseFetch(`time_entries?clock_in=gte.${today.toISOString()}&order=clock_in.desc`),
-        supabaseFetch(`time_entries?clock_in=gte.${weekStart.toISOString()}&order=clock_in.desc`)
-      ]);
+async function loadRequests() {
+  const pending = await supabaseFetch('time_requests?status=eq.pending&order=created_at.desc');
+  const history = await supabaseFetch('time_requests?status=neq.pending&order=created_at.desc');
+  const canApprove = currentUser.role === 'admin' || currentUser.role === 'manager';
+  document.getElementById('pendingRequests').innerHTML = (pending||[]).length ? pending.map(r => '<div class="flex justify-between items-center p-3 bg-gray-50 rounded mb-2"><div><p class="font-medium">' + r.employee_name + '</p><p class="text-sm text-gray-500">' + r.request_type + ' - ' + r.request_date + '</p></div>' + (canApprove?'<div class="flex gap-2"><button onclick="handleRequest(\'' + r.id + '\',\'approved\')" class="px-3 py-1 bg-green-500 text-white rounded text-sm">Y</button><button onclick="handleRequest(\'' + r.id + '\',\'denied\')" class="px-3 py-1 bg-red-500 text-white rounded text-sm">N</button></div>':'<span class="text-gray-500">Pending</span>') + '</div>').join('') : '<p class="text-gray-500">No pending</p>';
+  document.getElementById('requestHistory').innerHTML = (history||[]).length ? history.map(r => '<div class="py-2 flex justify-between"><div><p class="font-medium">' + r.employee_name + '</p><p class="text-sm text-gray-500">' + r.request_type + '</p></div><span class="px-2 py-1 rounded text-sm ' + (r.status==='approved'?'bg-green-100':'bg-red-100') + '">' + r.status + '</span></div>').join('') : '<p class="text-gray-500">No history</p>';
+}
 
-      // Today's total
-      const todayMs = (todayData || []).reduce((sum, e) => {
-        if (!e.clock_out) return sum;
-        return sum + (new Date(e.clock_out) - new Date(e.clock_in));
-      }, 0);
+async function handleRequest(id, status) {
+  await supabasePatch('time_requests?id=eq.' + id, {status});
+  loadRequests();
+}
 
-      // Week total
-      const weekMs = (weekData || []).reduce((sum, e) => {
-        if (!e.clock_out) return sum;
-        return sum + (new Date(e.clock_out) - new Date(e.clock_in));
-      }, 0);
+async function loadReport() {
+  const period = document.getElementById('reportPeriod').value;
+  const today = new Date(); today.setHours(0,0,0,0);
+  let start, end;
+  if(period==='week'){ start = new Date(today); start.setDate(today.getDate()-today.getDay()+1); end = new Date(start); end.setDate(start.getDate()+6); }
+  else{ start = new Date(today.getFullYear(), today.getMonth(), 1); end = new Date(today.getFullYear(), today.getMonth()+1, 0); }
+  
+  const entries = await supabaseFetch('time_entries?clock_in=gte.' + start.toISOString() + '&clock_in=lte.' + end.toISOString());
+  reportData = entries || [];
+  
+  const grouped = {};
+  (entries||[]).forEach(e => {
+    if(!grouped[e.employee_name]) grouped[e.employee_name] = {work:0, brk:0};
+    if(e.clock_out && !e.is_break) grouped[e.employee_name].work += new Date(e.clock_out)-new Date(e.clock_in);
+    if(e.clock_out && e.is_break) grouped[e.employee_name].brk += new Date(e.clock_out)-new Date(e.clock_in);
+  });
+  
+  document.getElementById('reportBody').innerHTML = Object.entries(grouped).map(([name,data]) => '<tr><td class="px-4 py-2">' + name + '</td><td class="px-4 py-2 text-right">' + formatHours(data.work) + '</td><td class="px-4 py-2 text-right">' + formatHours(data.brk) + '</td></tr>').join('') || '<tr><td colspan="3" class="px-4 py-8 text-center text-gray-500">No data</td></tr>';
+}
 
-      document.getElementById('todayTotal').textContent = formatDuration(todayMs);
-      document.getElementById('weekTotal').textContent = formatDuration(weekMs);
+function exportCSV() {
+  let csv = 'Employee,Hours,Breaks\n';
+  document.querySelectorAll('#reportBody tr').forEach(tr => {
+    const cells = tr.querySelectorAll('td');
+    if(cells.length === 3) csv += cells[0].textContent + ',' + cells[1].textContent + ',' + cells[2].textContent + '\n';
+  });
+  const blob = new Blob([csv], {type: 'text/csv'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'report.csv'; a.click();
+}
 
-      // Render entries
-      const entriesEl = document.getElementById('entries');
-      const entries = todayData || [];
-      
-      if (entries.length === 0) {
-        entriesEl.innerHTML = '<div class="p-8 text-center text-gray-500">No entries today</div>';
-        return;
-      }
-
-      entriesEl.innerHTML = entries.map(e => `
-        <div class="p-4 flex items-center justify-between hover:bg-gray-50">
-          <div>
-            <p class="font-medium text-gray-900">${e.employee_name}</p>
-            <p class="text-sm text-gray-500">
-              ${formatDate(e.clock_in)} → ${e.clock_out ? formatDate(e.clock_out) : 'Active'}
-            </p>
-          </div>
-          <div class="text-right">
-            <p class="font-bold ${e.clock_out ? 'text-gray-700' : 'text-green-600'}">
-              ${formatDuration(e.clock_out ? new Date(e.clock_out) - new Date(e.clock_in) : new Date() - new Date(e.clock_in))}
-            </p>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function formatDuration(ms) {
-      const hours = Math.floor(ms / (1000 * 60 * 60));
-      const mins = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
-      return `${hours}h ${mins}m`;
-    }
-
-    function formatDate(dateStr) {
-      return new Date(dateStr).toLocaleTimeString('en-US', { 
-        hour: '2-digit', 
-        minute: '2-digit' 
-      });
-    }
-
-    // Supabase helpers
-    async function supabaseFetch(query) {
-      try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/${query}`, {
-          headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`
-          }
-        });
-        return await res.json();
-      } catch (e) {
-        console.error(e);
-        return [];
-      }
-    }
-
-    async function supabasePost(table, data) {
-      try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
-          method: 'POST',
-          headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Content-Type': 'application/json',
-            'Prefer': 'return=representation'
-          },
-          body: JSON.stringify(data)
-        });
-        return await res.json();
-      } catch (e) {
-        console.error(e);
-        return null;
-      }
-    }
-
-    async function supabasePatch(query, data) {
-      try {
-        await fetch(`${SUPABASE_URL}/rest/v1/${query}`, {
-          method: 'PATCH',
-          headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data)
-        });
-      } catch (e) {
-        console.error(e);
-      }
-    }
+// Helpers
+function supabaseFetch(q) { return fetch(SUPABASE_URL + '/rest/v1/' + q, {headers:{apikey:SUPABASE_KEY, Authorization:'Bearer ' + SUPABASE_KEY}}).then(r=>r.json()).catch(()=>[]); }
+function supabasePost(t,d) { return fetch(SUPABASE_URL + '/rest/v1/' + t, {method:'POST',headers:{apikey:SUPABASE_KEY, Authorization:'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify(d)}).then(r=>r.json()).catch(()=>({})); }
+function supabasePatch(q,d) { return fetch(SUPABASE_URL + '/rest/v1/' + q, {method:'PATCH',headers:{apikey:SUPABASE_KEY, Authorization:'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify(d)}).then(()=>{}); }
+function formatHours(ms) { return Math.floor(ms/3600000) + 'h ' + Math.floor((ms%3600000)/60000) + 'm'; }
+function formatDuration(ms) { return Math.floor(ms/3600000) + 'h ' + Math.floor((ms%3600000)/60000) + 'm'; }
+function formatDate(d) { return new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
+function formatTime(d) { return new Date(d).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}); }
   </script>
 </body>
 </html>
