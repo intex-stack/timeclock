@@ -165,9 +165,18 @@ function showView(viewName) {
 }
 
 async function loadTimeClock() {
+  // Check for any OPEN entry (clock_out is null)
   const { data } = await supabaseFetch('time_entries?user_id=eq.' + currentUser.id + '&clock_out=is.null&order=clock_in.desc&limit=1');
-  if (data && data.length > 0) { currentEntry = data[0]; updateClockUI(true, currentEntry.is_break); startTimer(currentEntry.clock_in); }
-  else updateClockUI(false, false);
+  console.log('Current entry check:', data);
+  
+  if (data && data.length > 0) { 
+    currentEntry = data[0]; 
+    updateClockUI(true, currentEntry.is_break); 
+    startTimer(currentEntry.clock_in); 
+  } else {
+    currentEntry = null;
+    updateClockUI(false, false); 
+  }
   
   const today = new Date(); today.setHours(0,0,0,0);
   const weekStart = new Date(today); weekStart.setDate(today.getDate() - today.getDay() + (today.getDay()===0?-6:1)); weekStart.setHours(0,0,0,0);
@@ -188,12 +197,25 @@ async function loadTimeClock() {
 }
 
 async function handleClock() {
+  console.log('handleClock called, currentEntry:', currentEntry);
+  
   if (currentEntry) { 
-    await supabasePatch('time_entries?id=eq.' + currentEntry.id, {clock_out: new Date().toISOString()}); 
+    // CLOCK OUT
+    console.log('Clocking out entry:', currentEntry.id);
+    const result = await supabasePatch('time_entries?id=eq.' + currentEntry.id, {clock_out: new Date().toISOString()}); 
+    console.log('Clock out result:', result);
     currentEntry = null; stopTimer(); updateClockUI(false,false); 
   } else { 
-    const { data } = await supabasePost('time_entries', {user_id: currentUser.id, employee_name: currentUser.name, clock_in: new Date().toISOString(), is_break: false}); 
-    if(data&&data[0]){ currentEntry=data[0]; updateClockUI(true,false); startTimer(currentEntry.clock_in); } 
+    // CLOCK IN
+    console.log('Clocking in user:', currentUser.id);
+    const { data } = await supabasePost('time_entries', {
+      user_id: currentUser.id, 
+      employee_name: currentUser.name, 
+      clock_in: new Date().toISOString(), 
+      is_break: false
+    }); 
+    console.log('Clock in result:', data);
+    if(data && data[0]){ currentEntry=data[0]; updateClockUI(true,false); startTimer(currentEntry.clock_in); } 
   }
   loadTimeClock();
 }
@@ -210,11 +232,23 @@ async function toggleBreak() {
 function updateClockUI(clocked, isBreak) {
   const badge = document.getElementById('statusBadge'), timer = document.getElementById('timerDisplay'), btn = document.getElementById('clockBtn'), breakBtn = document.getElementById('breakBtn');
   if (clocked) {
-    if (isBreak) { badge.textContent='On Break'; badge.className='inline-block px-6 py-3 rounded-lg bg-yellow-100 mb-4'; btn.textContent='End Break'; btn.className='px-8 py-4 bg-orange-500 text-white rounded-xl'; breakBtn.classList.add('hidden'); }
-    else { badge.textContent='Working'; badge.className='inline-block px-6 py-3 rounded-lg bg-green-100 mb-4'; btn.textContent='Clock Out'; btn.className='px-8 py-4 bg-red-500 text-white rounded-xl'; breakBtn.classList.remove('hidden'); }
+    if (isBreak) { 
+      badge.textContent='On Break'; badge.className='inline-block px-6 py-3 rounded-lg bg-yellow-100 mb-4'; 
+      btn.textContent='End Break'; btn.className='px-8 py-4 bg-orange-500 text-white rounded-xl'; 
+      breakBtn.classList.add('hidden'); 
+    } else { 
+      badge.textContent='Working'; badge.className='inline-block px-6 py-3 rounded-lg bg-green-100 mb-4'; 
+      btn.textContent='Clock Out'; btn.className='px-8 py-4 bg-red-500 text-white rounded-xl'; 
+      breakBtn.classList.remove('hidden'); 
+    }
     document.getElementById('sessionType').textContent = isBreak ? 'On Break' : 'Working';
     timer.classList.remove('hidden');
-  } else { badge.textContent='Not Clocked In'; badge.className='inline-block px-6 py-3 rounded-lg bg-gray-100 mb-4'; timer.classList.add('hidden'); btn.textContent='Clock In'; btn.className='px-8 py-4 bg-green-500 text-white rounded-xl'; breakBtn.classList.add('hidden'); }
+  } else { 
+    badge.textContent='Not Clocked In'; badge.className='inline-block px-6 py-3 rounded-lg bg-gray-100 mb-4'; 
+    timer.classList.add('hidden'); 
+    btn.textContent='Clock In'; btn.className='px-8 py-4 bg-green-500 text-white rounded-xl'; 
+    breakBtn.classList.add('hidden'); 
+  }
 }
 
 function startTimer(clockIn) {
@@ -296,10 +330,9 @@ function exportCSV() {
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'report.csv'; a.click();
 }
 
-// Helpers
 function supabaseFetch(q) { return fetch(SUPABASE_URL + '/rest/v1/' + q, {headers:{apikey:SUPABASE_KEY, Authorization:'Bearer ' + SUPABASE_KEY}}).then(r=>r.json()).catch(()=>[]); }
 function supabasePost(t,d) { return fetch(SUPABASE_URL + '/rest/v1/' + t, {method:'POST',headers:{apikey:SUPABASE_KEY, Authorization:'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify(d)}).then(r=>r.json()).catch(()=>({})); }
-function supabasePatch(q,d) { return fetch(SUPABASE_URL + '/rest/v1/' + q, {method:'PATCH',headers:{apikey:SUPABASE_KEY, Authorization:'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify(d)}).then(()=>{}); }
+function supabasePatch(q,d) { return fetch(SUPABASE_URL + '/rest/v1/' + q, {method:'PATCH',headers:{apikey:SUPABASE_KEY, Authorization:'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify(d)}).then(r=>r.ok ? r.json() : r.text().then(t=>console.error('PATCH error:',t))).catch(e=>console.error('PATCH exception:',e)); }
 function formatHours(ms) { return Math.floor(ms/3600000) + 'h ' + Math.floor((ms%3600000)/60000) + 'm'; }
 function formatDuration(ms) { return Math.floor(ms/3600000) + 'h ' + Math.floor((ms%3600000)/60000) + 'm'; }
 function formatDate(d) { return new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
