@@ -3,30 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Time Clock Pro - Employee Time Tracking</title>
+  <title>Time Clock Pro</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
     body { font-family: 'Inter', sans-serif; }
     .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-    .card-hover { transition: all 0.3s ease; }
-    .card-hover:hover { transform: translateY(-2px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
   </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen">
-  <!-- Login Screen -->
+  <!-- Login -->
   <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md">
       <div class="text-center mb-8">
-        <div class="w-20 h-20 gradient-bg rounded-2xl flex items-center justify-center text-4xl mx-auto mb-4 shadow-lg">⏰</div>
+        <div class="w-20 h-20 gradient-bg rounded-2xl flex items-center justify-center text-4xl mx-auto mb-4">⏰</div>
         <h1 class="text-3xl font-bold text-slate-800">Time Clock Pro</h1>
-        <p class="text-slate-500 mt-2">Employee Time Tracking</p>
+        <p class="text-slate-500 mt-2">Sign in to clock in</p>
       </div>
       <div id="loginForm">
-        <input type="text" id="username" placeholder="Username" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl mb-4 focus:border-indigo-500">
-        <input type="password" id="password" placeholder="Password" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl mb-6 focus:border-indigo-500">
-        <button onclick="login()" class="w-full py-3 gradient-bg text-white text-lg font-bold rounded-xl shadow-lg">Sign In</button>
+        <input type="text" id="username" placeholder="Username" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl mb-4">
+        <input type="password" id="password" placeholder="Password" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl mb-6">
+        <button onclick="login()" class="w-full py-3 gradient-bg text-white text-lg font-bold rounded-xl">Sign In</button>
         <p id="loginError" class="text-red-500 text-center mt-4 hidden"></p>
       </div>
       <div class="mt-6 text-center">
@@ -36,11 +34,7 @@
         <input type="text" id="regUsername" placeholder="Username" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl mb-4">
         <input type="password" id="regPassword" placeholder="Password" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl mb-4">
         <input type="text" id="regName" placeholder="Full Name" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl mb-6">
-        <select id="regRole" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl mb-6">
-          <option value="employee">Employee</option>
-          <option value="manager">Manager</option>
-        </select>
-        <button onclick="register()" class="w-full py-3 bg-green-500 text-white text-lg font-bold rounded-xl shadow-lg">Register</button>
+        <button onclick="register()" class="w-full py-3 bg-green-500 text-white text-lg font-bold rounded-xl">Register</button>
         <p id="regError" class="text-red-500 text-center mt-4 hidden"></p>
         <button onclick="showLogin()" class="w-full mt-4 text-slate-500">Back</button>
       </div>
@@ -50,70 +44,69 @@
   <!-- Main App -->
   <div id="appScreen" class="hidden">
     <nav class="bg-white shadow-lg border-b">
-      <div class="max-w-7xl mx-auto px-4">
-        <div class="flex items-center justify-between h-16">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 gradient-bg rounded-xl flex items-center justify-center text-xl shadow-lg">⏰</div>
-            <span class="text-xl font-bold text-slate-800">Time Clock Pro</span>
-          </div>
-          <div class="flex items-center gap-4">
-            <div class="text-right">
-              <p id="userDisplay" class="font-semibold text-slate-800"></p>
-              <p id="userRole" class="text-xs text-slate-500 capitalize"></p>
-            </div>
-            <button onclick="logout()" class="text-red-500 hover:text-red-600 font-medium">Logout</button>
-          </div>
+      <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 gradient-bg rounded-xl flex items-center justify-center text-xl">⏰</div>
+          <span class="text-xl font-bold text-slate-800">Time Clock Pro</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <span id="userDisplay" class="font-semibold text-slate-700"></span>
+          <button onclick="logout()" class="text-red-500 font-medium">Logout</button>
         </div>
       </div>
     </nav>
 
-    <div class="bg-white shadow-sm border-b">
-      <div class="max-w-7xl mx-auto px-4">
-        <div class="flex gap-2 overflow-x-auto py-3">
-          <button onclick="showView('clock')" class="nav-btn px-5 py-2.5 rounded-xl font-medium whitespace-nowrap bg-indigo-500 text-white shadow-lg">⏱️ Clock</button>
-          <button onclick="showView('whosIn')" class="nav-btn px-5 py-2.5 rounded-xl font-medium whitespace-nowrap bg-slate-100 text-slate-600">👥 Who's In</button>
-          <button onclick="showView('schedule')" class="nav-btn px-5 py-2.5 rounded-xl font-medium whitespace-nowrap bg-slate-100 text-slate-600">📅 Schedule</button>
-          <button onclick="showView('timeoff')" class="nav-btn px-5 py-2.5 rounded-xl font-medium whitespace-nowrap bg-slate-100 text-slate-600">🏖️ Time Off</button>
-          <button onclick="showView('reports')" class="nav-btn px-5 py-2.5 rounded-xl font-medium whitespace-nowrap bg-slate-100 text-slate-600">📊 Reports</button>
-          <button onclick="showView('employees')" id="adminTab" class="nav-btn hidden px-5 py-2.5 rounded-xl font-medium whitespace-nowrap bg-slate-100 text-slate-600">👤 Employees</button>
-        </div>
+    <div class="max-w-4xl mx-auto p-6">
+      <!-- Tab Navigation -->
+      <div class="flex gap-2 mb-6 overflow-x-auto">
+        <button onclick="showView('clock')" class="nav-btn px-5 py-2.5 rounded-xl font-medium bg-indigo-500 text-white">⏱️ Clock</button>
+        <button onclick="showView('whosIn')" class="nav-btn px-5 py-2.5 rounded-xl font-medium bg-slate-100">👥 Who's In</button>
+        <button onclick="showView('schedule')" class="nav-btn px-5 py-2.5 rounded-xl font-medium bg-slate-100">📅 Schedule</button>
+        <button onclick="showView('reports')" class="nav-btn px-5 py-2.5 rounded-xl font-medium bg-slate-100">📊 Reports</button>
       </div>
-    </div>
 
-    <div class="max-w-7xl mx-auto p-6">
       <!-- CLOCK VIEW -->
       <div id="view-clock" class="view">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div class="lg:col-span-2">
-            <div class="bg-white rounded-3xl shadow-xl p-8 text-center card-hover">
-              <div class="mb-6">
-                <div id="currentTime" class="text-5xl font-bold text-slate-800 mb-2"></div>
-                <div id="currentDate" class="text-lg text-slate-500"></div>
-              </div>
-              <div id="statusBadge" class="inline-block px-8 py-4 rounded-2xl text-2xl font-bold mb-6 bg-slate-100 text-slate-600">Not Clocked In</div>
-              <div id="timerDisplay" class="hidden mb-6">
-                <p id="sessionType" class="text-slate-500 text-lg mb-2">Working</p>
-                <p id="timer" class="text-7xl font-bold text-indigo-600">00:00:00</p>
-              </div>
-              <div class="flex justify-center gap-4">
-                <button id="clockBtn" onclick="handleClock()" class="px-10 py-5 gradient-bg text-white text-2xl font-bold rounded-2xl shadow-lg">Clock In</button>
-                <button id="breakBtn" onclick="toggleBreak()" class="hidden px-6 py-5 bg-yellow-500 text-white text-xl font-bold rounded-2xl shadow-lg">Take Break</button>
-              </div>
+        <div class="grid md:grid-cols-2 gap-6">
+          <!-- Main Clock -->
+          <div class="bg-white rounded-3xl shadow-xl p-8 text-center">
+            <div class="mb-4">
+              <div id="currentTime" class="text-5xl font-bold text-slate-800"></div>
+              <div id="currentDate" class="text-lg text-slate-500"></div>
             </div>
+            
+            <div id="statusBadge" class="inline-block px-8 py-4 rounded-2xl text-2xl font-bold mb-4 bg-slate-100 text-slate-600">Not Clocked In</div>
+            
+            <div id="timerDisplay" class="hidden mb-4">
+              <p id="sessionType" class="text-slate-500 text-lg">Working</p>
+              <p id="timer" class="text-6xl font-bold text-indigo-600">00:00:00</p>
+            </div>
+            
+            <button id="clockBtn" onclick="handleClock()" class="px-10 py-5 gradient-bg text-white text-2xl font-bold rounded-2xl shadow-lg w-full">
+              Clock In
+            </button>
+            <button id="breakBtn" onclick="toggleBreak()" class="hidden mt-2 px-6 py-3 bg-yellow-500 text-white rounded-xl w-full">
+              Take Break
+            </button>
+            
+            <p id="debugInfo" class="text-xs text-slate-400 mt-4"></p>
           </div>
+
+          <!-- Stats -->
           <div class="space-y-4">
             <div class="bg-white rounded-2xl shadow-lg p-6">
               <h3 class="font-bold text-slate-700 mb-4">📊 My Hours</h3>
               <div class="space-y-3">
-                <div class="flex justify-between p-3 bg-blue-50 rounded-xl"><span class="text-slate-600">Today</span><span class="font-bold text-blue-600" id="myTodayHours">0h 0m</span></div>
-                <div class="flex justify-between p-3 bg-purple-50 rounded-xl"><span class="text-slate-600">This Week</span><span class="font-bold text-purple-600" id="myWeekHours">0h 0m</span></div>
-                <div class="flex justify-between p-3 bg-orange-50 rounded-xl"><span class="text-slate-600">This Period</span><span class="font-bold text-orange-600" id="myMonthHours">0h 0m</span></div>
-                <div class="flex justify-between p-3 bg-red-50 rounded-xl"><span class="text-slate-600">Overtime</span><span class="font-bold text-red-600" id="myOvertime">0h 0m</span></div>
+                <div class="flex justify-between p-3 bg-blue-50 rounded-xl"><span>Today</span><span class="font-bold text-blue-600" id="myTodayHours">0h 0m</span></div>
+                <div class="flex justify-between p-3 bg-purple-50 rounded-xl"><span>This Week</span><span class="font-bold text-purple-600" id="myWeekHours">0h 0m</span></div>
+                <div class="flex justify-between p-3 bg-orange-50 rounded-xl"><span>This Period</span><span class="font-bold text-orange-600" id="myMonthHours">0h 0m</span></div>
+                <div class="flex justify-between p-3 bg-red-50 rounded-xl"><span>Overtime</span><span class="font-bold text-red-600" id="myOvertime">0h 0m</span></div>
               </div>
             </div>
+
             <div class="bg-white rounded-2xl shadow-lg p-6">
               <h3 class="font-bold text-slate-700 mb-4">📋 Recent Entries</h3>
-              <div id="myEntries" class="space-y-2 max-h-64 overflow-y-auto"></div>
+              <div id="myEntries" class="space-y-2 max-h-48 overflow-y-auto"></div>
             </div>
           </div>
         </div>
@@ -122,50 +115,27 @@
       <!-- WHO'S IN -->
       <div id="view-whosIn" class="view hidden">
         <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div class="px-6 py-4 gradient-bg"><h2 class="text-xl font-bold text-white">👥 Who's Currently Working</h2></div>
+          <div class="px-6 py-4 gradient-bg"><h2 class="text-xl font-bold text-white">👥 Who's Working Now</h2></div>
           <div id="whosInList" class="divide-y"></div>
         </div>
       </div>
 
       <!-- SCHEDULE -->
       <div id="view-schedule" class="view hidden">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="grid md:grid-cols-2 gap-6">
           <div class="bg-white rounded-2xl shadow-lg p-6">
-            <div class="flex justify-between mb-6"><h2 class="text-xl font-bold">📅 Weekly Schedule</h2>
-              <div class="flex gap-2"><button onclick="changeWeek(-1)" class="px-3 py-2 bg-slate-100 rounded">←</button><span id="weekRange" class="px-4 py-2 bg-slate-100 rounded"></span><button onclick="changeWeek(1)" class="px-3 py-2 bg-slate-100 rounded">→</button></div>
-            </div>
+            <h2 class="text-xl font-bold mb-4">📅 Weekly Schedule</h2>
+            <div class="flex gap-2 mb-4"><button onclick="changeWeek(-1)" class="px-3 py-2 bg-slate-100 rounded">←</button><span id="weekRange" class="flex-1 text-center py-2 bg-slate-100 rounded"></span><button onclick="changeWeek(1)" class="px-3 py-2 bg-slate-100 rounded">→</button></div>
             <div id="scheduleGrid" class="grid grid-cols-7 gap-2"></div>
           </div>
           <div class="bg-white rounded-2xl shadow-lg p-6">
-            <h2 class="text-xl font-bold mb-6">🏖️ Request Time Off</h2>
-            <div class="space-y-4">
-              <input type="date" id="requestDate" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl">
-              <select id="requestType" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl">
-                <option value="vacation">Vacation</option><option value="sick">Sick Day</option><option value="personal">Personal</option>
-              </select>
-              <textarea id="requestNotes" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl" rows="2" placeholder="Notes..."></textarea>
-              <button onclick="submitRequest()" class="w-full py-3 gradient-bg text-white font-bold rounded-xl">Submit Request</button>
-            </div>
-            <h3 class="font-bold mt-8 mb-4">📋 My Requests</h3>
+            <h2 class="text-xl font-bold mb-4">🏖️ Request Time Off</h2>
+            <input type="date" id="requestDate" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl mb-3">
+            <select id="requestType" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl mb-3">
+              <option value="vacation">Vacation</option><option value="sick">Sick Day</option><option value="personal">Personal</option>
+            </select>
+            <button onclick="submitRequest()" class="w-full py-3 gradient-bg text-white font-bold rounded-xl mb-4">Submit</button>
             <div id="myRequests" class="space-y-2 max-h-48 overflow-y-auto"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- TIME OFF -->
-      <div id="view-timeoff" class="view hidden">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div class="bg-white rounded-2xl shadow-lg p-6">
-            <h2 class="text-xl font-bold mb-6">🏖️ My Time Off Balances</h2>
-            <div class="space-y-4">
-              <div class="p-4 bg-blue-50 rounded-xl flex justify-between"><span class="font-medium">Vacation</span><span class="text-3xl font-bold text-blue-600" id="vacationBalance">10</span></div>
-              <div class="p-4 bg-red-50 rounded-xl flex justify-between"><span class="font-medium">Sick Days</span><span class="text-3xl font-bold text-red-600" id="sickBalance">5</span></div>
-              <div class="p-4 bg-purple-50 rounded-xl flex justify-between"><span class="font-medium">Personal</span><span class="text-3xl font-bold text-purple-600" id="personalBalance">3</span></div>
-            </div>
-          </div>
-          <div class="bg-white rounded-2xl shadow-lg p-6">
-            <h2 class="text-xl font-bold mb-6">⏳ Pending Requests</h2>
-            <div id="pendingRequests" class="space-y-3"></div>
           </div>
         </div>
       </div>
@@ -175,53 +145,22 @@
         <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
           <div class="px-6 py-4 gradient-bg flex justify-between items-center">
             <h2 class="text-xl font-bold text-white">📊 Hours Report</h2>
-            <button onclick="exportCSV()" class="px-4 py-2 bg-white/20 text-white rounded-lg">📥 Export CSV</button>
+            <button onclick="exportCSV()" class="px-4 py-2 bg-white/20 text-white rounded-lg">📥 Export</button>
           </div>
           <div class="p-6">
-            <div class="flex flex-wrap gap-4 mb-6">
+            <div class="flex gap-4 mb-6">
               <select id="reportPeriod" class="px-4 py-3 border-2 border-slate-200 rounded-xl">
-                <option value="today">Today</option><option value="week" selected>This Week</option>
-                <option value="month">This Month</option><option value="year">This Year</option>
+                <option value="today">Today</option><option value="week" selected>This Week</option><option value="month">This Month</option>
               </select>
               <button onclick="loadReport()" class="px-6 py-3 gradient-bg text-white font-bold rounded-xl">Generate</button>
             </div>
             <table class="w-full">
-              <thead class="bg-slate-50"><tr><th class="px-4 py-3 text-left">Employee</th><th class="px-4 py-3 text-right">Regular</th><th class="px-4 py-3 text-right">Overtime</th><th class="px-4 py-3 text-right">Total</th></tr></thead>
+              <thead class="bg-slate-50"><tr><th class="px-4 py-3 text-left">Employee</th><th class="px-4 py-3 text-right">Hours</th><th class="px-4 py-3 text-right">Breaks</th></tr></thead>
               <tbody id="reportBody"></tbody>
             </table>
           </div>
         </div>
       </div>
-
-      <!-- EMPLOYEES -->
-      <div id="view-employees" class="view hidden">
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div class="px-6 py-4 gradient-bg flex justify-between">
-            <h2 class="text-xl font-bold text-white">👥 Employee Management</h2>
-            <button onclick="showAddEmployee()" class="px-4 py-2 bg-white text-indigo-600 font-bold rounded-lg">+ Add</button>
-          </div>
-          <div class="p-6"><div id="employeesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Add Employee Modal -->
-  <div id="addEmployeeModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full">
-      <div class="px-6 py-4 gradient-bg"><h2 class="text-xl font-bold text-white">Add Employee</h2></div>
-      <form onsubmit="addEmployee(event)" class="p-6 space-y-4">
-        <input type="text" id="empUsername" placeholder="Username" required class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl">
-        <input type="password" id="empPassword" placeholder="Password" required class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl">
-        <input type="text" id="empName" placeholder="Full Name" required class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl">
-        <select id="empRole" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl">
-          <option value="employee">Employee</option><option value="manager">Manager</option>
-        </select>
-        <div class="flex gap-3">
-          <button type="button" onclick="closeAddEmployee()" class="flex-1 py-3 border-2 border-slate-200 rounded-xl">Cancel</button>
-          <button type="submit" class="flex-1 py-3 gradient-bg text-white font-bold rounded-xl">Add</button>
-        </div>
-      </form>
     </div>
   </div>
 
@@ -232,7 +171,16 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 let currentUser = null, currentEntry = null, timerInterval = null, weekOffset = 0;
 
 const savedUser = localStorage.getItem('timeclock_user');
-if (savedUser) { currentUser = JSON.parse(savedUser); showApp(); }
+if (savedUser) { 
+  try {
+    currentUser = JSON.parse(savedUser);
+    console.log('Loaded user:', currentUser);
+    showApp(); 
+  } catch(e) {
+    console.error('Error loading user:', e);
+    localStorage.removeItem('timeclock_user');
+  }
+}
 
 function updateClock() {
   const now = new Date();
@@ -242,63 +190,108 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-function showLogin() { document.getElementById('loginScreen').classList.remove('hidden'); document.getElementById('appScreen').classList.add('hidden'); document.getElementById('loginForm').classList.remove('hidden'); document.getElementById('registerForm').classList.add('hidden'); }
+function showLogin() { 
+  document.getElementById('loginScreen').classList.remove('hidden'); 
+  document.getElementById('appScreen').classList.add('hidden'); 
+  document.getElementById('loginForm').classList.remove('hidden');
+  document.getElementById('registerForm').classList.add('hidden');
+}
 function showRegister() { document.getElementById('loginForm').classList.add('hidden'); document.getElementById('registerForm').classList.remove('hidden'); }
 
 async function login() {
   const u = document.getElementById('username').value.trim();
   const p = document.getElementById('password').value;
   if (!u || !p) return showError('Enter username and password');
+  
+  console.log('Logging in:', u);
   const data = await supabaseFetch('users?username=eq.' + encodeURIComponent(u) + '&password=eq.' + encodeURIComponent(p) + '&limit=1');
+  console.log('Login response:', data);
+  
   if (!data || data.length === 0) return showError('Invalid credentials');
-  currentUser = data[0]; localStorage.setItem('timeclock_user', JSON.stringify(currentUser)); showApp();
+  
+  currentUser = data[0];
+  console.log('User logged in:', currentUser);
+  localStorage.setItem('timeclock_user', JSON.stringify(currentUser)); 
+  showApp();
 }
 
 async function register() {
   const u = document.getElementById('regUsername').value.trim();
   const p = document.getElementById('regPassword').value;
   const n = document.getElementById('regName').value.trim();
-  const r = document.getElementById('regRole').value;
   if (!u || !p || !n) return showRegError('Fill all fields');
+  
+  console.log('Registering:', u, n);
   const existing = await supabaseFetch('users?username=eq.' + encodeURIComponent(u) + '&limit=1');
   if (existing && existing.length > 0) return showRegError('Username taken');
-  await supabasePost('users', { username: u, password: p, name: n, role: r });
-  currentUser = { username: u, name: n, role: r }; localStorage.setItem('timeclock_user', JSON.stringify(currentUser)); showApp();
+  
+  const result = await supabasePost('users', { username: u, password: p, name: n, role: 'employee' });
+  console.log('Register result:', result);
+  
+  // Fetch the created user to get the ID
+  const newUser = await supabaseFetch('users?username=eq.' + encodeURIComponent(u) + '&limit=1');
+  console.log('New user:', newUser);
+  
+  if (newUser && newUser.length > 0) {
+    currentUser = newUser[0];
+    localStorage.setItem('timeclock_user', JSON.stringify(currentUser)); 
+    showApp();
+  } else {
+    showRegError('Registration failed');
+  }
 }
 
-function logout() { localStorage.removeItem('timeclock_user'); currentUser = null; stopTimer(); showLogin(); }
+function logout() { 
+  localStorage.removeItem('timeclock_user'); 
+  currentUser = null; 
+  stopTimer(); 
+  showLogin(); 
+}
 function showError(msg) { const el = document.getElementById('loginError'); el.textContent = msg; el.classList.remove('hidden'); }
 function showRegError(msg) { const el = document.getElementById('regError'); el.textContent = msg; el.classList.remove('hidden'); }
 
 function showApp() {
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('appScreen').classList.remove('hidden');
-  document.getElementById('userDisplay').textContent = currentUser.name;
-  document.getElementById('userRole').textContent = currentUser.role;
-  if (currentUser.role === 'admin' || currentUser.role === 'manager') {
-    document.getElementById('adminTab').classList.remove('hidden');
-    document.getElementById('adminTab').classList.add('bg-slate-100', 'text-slate-600');
-  }
+  document.getElementById('userDisplay').textContent = currentUser?.name;
+  document.getElementById('debugInfo').textContent = 'User ID: ' + (currentUser?.id || 'None');
   showView('clock');
 }
 
 function showView(viewName) {
   document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
   document.getElementById('view-' + viewName).classList.remove('hidden');
-  document.querySelectorAll('.nav-btn').forEach(btn => btn.className = 'nav-btn px-5 py-2.5 rounded-xl font-medium whitespace-nowrap bg-slate-100 text-slate-600');
+  document.querySelectorAll('.nav-btn').forEach(btn => btn.className = 'nav-btn px-5 py-2.5 rounded-xl font-medium bg-slate-100');
+  event?.target?.classList.add('bg-indigo-500', 'text-white');
   if (viewName === 'clock') loadTimeClock();
   if (viewName === 'whosIn') loadWhosIn();
   if (viewName === 'schedule') loadSchedule();
-  if (viewName === 'timeoff') loadTimeOff();
   if (viewName === 'reports') loadReport();
-  if (viewName === 'employees') loadEmployees();
 }
 
 async function loadTimeClock() {
-  const { data } = await supabaseFetch('time_entries?user_id=eq.' + currentUser.id + '&clock_out=is.null&order=clock_in.desc&limit=1');
-  if (data && data.length > 0) { currentEntry = data[0]; updateClockUI(true, currentEntry.is_break); startTimer(currentEntry.clock_in); }
-  else { currentEntry = null; updateClockUI(false, false); }
+  if (!currentUser?.id) {
+    console.error('No user ID');
+    return;
+  }
   
+  console.log('Loading clock for user:', currentUser.id);
+  
+  // Check for open entry
+  const { data, error } = await supabaseFetch('time_entries?user_id=eq.' + currentUser.id + '&clock_out=is.null&order=clock_in.desc&limit=1');
+  console.log('Open entries:', data, error);
+  
+  if (data && data.length > 0) { 
+    currentEntry = data[0]; 
+    console.log('Found open entry:', currentEntry);
+    updateClockUI(true, currentEntry.is_break); 
+    startTimer(currentEntry.clock_in); 
+  } else {
+    currentEntry = null;
+    updateClockUI(false, false); 
+  }
+  
+  // Load stats
   const today = new Date(); today.setHours(0,0,0,0);
   const weekStart = new Date(today); weekStart.setDate(today.getDate() - today.getDay() + 1); weekStart.setHours(0,0,0,0);
   const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -308,6 +301,8 @@ async function loadTimeClock() {
     supabaseFetch('time_entries?user_id=eq.' + currentUser.id + '&clock_in=gte.' + weekStart.toISOString()),
     supabaseFetch('time_entries?user_id=eq.' + currentUser.id + '&clock_in=gte.' + monthStart.toISOString())
   ]);
+  
+  console.log('Stats:', { today: tD, week: wD, month: mD });
   
   const todayHours = calcHoursMs(tD||[]);
   const weekHours = calcHoursMs(wD||[]);
@@ -319,7 +314,9 @@ async function loadTimeClock() {
   document.getElementById('myMonthHours').innerHTML = formatHours(monthHours);
   document.getElementById('myOvertime').innerHTML = formatHours(overtime);
   
+  // Recent entries
   const weekEntries = await supabaseFetch('time_entries?user_id=eq.' + currentUser.id + '&clock_in=gte.' + weekStart.toISOString() + '&order=clock_in.desc&limit=10');
+  console.log('Recent entries:', weekEntries);
   document.getElementById('myEntries').innerHTML = (weekEntries||[]).map(e => { 
     const d = e.clock_out ? new Date(e.clock_out)-new Date(e.clock_in) : new Date()-new Date(e.clock_in); 
     return '<div class="p-3 flex justify-between bg-slate-50 rounded-lg"><div><p class="font-medium ' + (e.is_break?'text-yellow-600':'text-slate-700') + '">' + (e.is_break?'Break':'Work') + '</p><p class="text-xs text-slate-400">' + formatDate(e.clock_in) + '</p></div><span class="font-bold">' + formatDuration(d) + '</span></div>'; 
@@ -327,33 +324,66 @@ async function loadTimeClock() {
 }
 
 async function handleClock() {
+  console.log('Clock action. Current entry:', currentEntry, 'User:', currentUser?.id);
+  
   if (currentEntry) { 
+    // Clock out
+    console.log('Clocking out entry:', currentEntry.id);
     await supabasePatch('time_entries?id=eq.' + currentEntry.id, {clock_out: new Date().toISOString()}); 
     currentEntry = null; stopTimer(); updateClockUI(false,false); 
+    loadTimeClock();
   } else { 
-    const { data } = await supabasePost('time_entries', { user_id: currentUser.id, employee_name: currentUser.name, clock_in: new Date().toISOString(), is_break: false }); 
-    if(data && data[0]){ currentEntry=data[0]; updateClockUI(true,false); startTimer(currentEntry.clock_in); } 
+    // Clock in
+    if (!currentUser?.id) {
+      alert('Error: Not logged in properly');
+      return;
+    }
+    console.log('Clocking in user:', currentUser.id, currentUser.name);
+    
+    const entryData = {
+      user_id: currentUser.id, 
+      employee_name: currentUser.name, 
+      clock_in: new Date().toISOString(), 
+      is_break: false
+    };
+    console.log('Creating entry:', entryData);
+    
+    const result = await supabasePost('time_entries', entryData);
+    console.log('Clock in result:', result);
+    
+    // Refresh to get the entry
+    await loadTimeClock();
   }
-  loadTimeClock();
 }
 
 async function toggleBreak() {
   if (!currentEntry) return;
   await supabasePatch('time_entries?id=eq.' + currentEntry.id, {clock_out: new Date().toISOString()});
   const isEnding = currentEntry.is_break;
-  const { data } = await supabasePost('time_entries', {user_id: currentUser.id, employee_name: currentUser.name, clock_in: new Date().toISOString(), is_break: !isEnding});
-  if(data&&data[0]){ currentEntry=data[0]; updateClockUI(true,!isEnding); startTimer(currentEntry.clock_in); }
+  await supabasePost('time_entries', {user_id: currentUser.id, employee_name: currentUser.name, clock_in: new Date().toISOString(), is_break: !isEnding});
   loadTimeClock();
 }
 
 function updateClockUI(clocked, isBreak) {
   const badge = document.getElementById('statusBadge'), timer = document.getElementById('timerDisplay'), btn = document.getElementById('clockBtn'), breakBtn = document.getElementById('breakBtn');
   if (clocked) {
-    if (isBreak) { badge.textContent='On Break'; badge.className='inline-block px-8 py-4 rounded-2xl text-2xl font-bold mb-6 bg-yellow-100 text-yellow-700'; btn.textContent='End Break'; btn.className='px-10 py-5 bg-orange-500 text-white text-2xl font-bold rounded-2xl shadow-lg'; breakBtn.classList.add('hidden'); }
-    else { badge.textContent='Working'; badge.className='inline-block px-8 py-4 rounded-2xl text-2xl font-bold mb-6 bg-green-100 text-green-700'; btn.textContent='Clock Out'; btn.className='px-10 py-5 bg-red-500 text-white text-2xl font-bold rounded-2xl shadow-lg'; breakBtn.classList.remove('hidden'); }
+    if (isBreak) { 
+      badge.textContent='On Break'; badge.className='inline-block px-8 py-4 rounded-2xl text-2xl font-bold mb-4 bg-yellow-100 text-yellow-700'; 
+      btn.textContent='End Break'; btn.className='px-10 py-5 bg-orange-500 text-white text-2xl font-bold rounded-2xl w-full'; 
+      breakBtn.classList.add('hidden'); 
+    } else { 
+      badge.textContent='Working'; badge.className='inline-block px-8 py-4 rounded-2xl text-2xl font-bold mb-4 bg-green-100 text-green-700'; 
+      btn.textContent='Clock Out'; btn.className='px-10 py-5 bg-red-500 text-white text-2xl font-bold rounded-2xl w-full'; 
+      breakBtn.classList.remove('hidden'); 
+    }
     document.getElementById('sessionType').textContent = isBreak ? 'On Break' : 'Working';
     timer.classList.remove('hidden');
-  } else { badge.textContent='Not Clocked In'; badge.className='inline-block px-8 py-4 rounded-2xl text-2xl font-bold mb-6 bg-slate-100 text-slate-600'; timer.classList.add('hidden'); btn.textContent='Clock In'; btn.className='px-10 py-5 gradient-bg text-white text-2xl font-bold rounded-2xl shadow-lg'; breakBtn.classList.add('hidden'); }
+  } else { 
+    badge.textContent='Not Clocked In'; badge.className='inline-block px-8 py-4 rounded-2xl text-2xl font-bold mb-4 bg-slate-100 text-slate-600'; 
+    timer.classList.add('hidden'); 
+    btn.textContent='Clock In'; btn.className='px-10 py-5 gradient-bg text-white text-2xl font-bold rounded-2xl w-full shadow-lg'; 
+    breakBtn.classList.add('hidden'); 
+  }
 }
 
 function startTimer(clockIn) {
@@ -368,7 +398,7 @@ async function loadWhosIn() {
   const now = new Date();
   document.getElementById('whosInList').innerHTML = (data||[]).map(e => {
     const elapsed = new Date(now) - new Date(e.clock_in);
-    return '<div class="p-4 flex items-center justify-between hover:bg-slate-50"><div class="flex items-center gap-4"><div class="w-12 h-12 gradient-bg rounded-xl flex items-center justify-center text-white font-bold">' + e.employee_name.charAt(0) + '</div><div><p class="font-bold">' + e.employee_name + '</p><p class="text-sm text-slate-500">In: ' + formatTime(e.clock_in) + '</p></div></div><div class="text-right"><span class="text-xl font-bold text-green-600">' + formatDuration(elapsed) + '</span><p class="text-xs ' + (e.is_break?'text-yellow-600':'text-green-600') + '">' + (e.is_break ? 'On Break' : 'Working') + '</p></div></div>';
+    return '<div class="p-4 flex items-center justify-between"><div class="flex items-center gap-4"><div class="w-12 h-12 gradient-bg rounded-full flex items-center justify-center text-white font-bold">' + e.employee_name.charAt(0) + '</div><div><p class="font-bold">' + e.employee_name + '</p><p class="text-sm text-slate-500">In: ' + formatTime(e.clock_in) + '</p></div></div><div class="text-right"><span class="text-xl font-bold text-green-600">' + formatDuration(elapsed) + '</span></div></div>';
   }).join('') || '<div class="p-8 text-center text-slate-400">No one is working</div>';
 }
 
@@ -390,23 +420,14 @@ async function loadSchedule() {
 async function submitRequest() {
   const date = document.getElementById('requestDate').value;
   const type = document.getElementById('requestType').value;
-  const notes = document.getElementById('requestNotes').value;
   if(!date) return alert('Select a date');
-  await supabasePost('time_requests', {user_id: currentUser.id, employee_name: currentUser.name, request_date: date, request_type: type, notes: notes, status: 'pending'});
-  alert('Request submitted!'); document.getElementById('requestDate').value = ''; document.getElementById('requestNotes').value = ''; loadMyRequests();
+  await supabasePost('time_requests', {user_id: currentUser.id, employee_name: currentUser.name, request_date: date, request_type: type, status: 'pending'});
+  alert('Request submitted!'); document.getElementById('requestDate').value = ''; loadMyRequests();
 }
 
 async function loadMyRequests() {
   const requests = await supabaseFetch('time_requests?user_id=eq.' + currentUser.id + '&order=created_at.desc&limit=10');
   document.getElementById('myRequests').innerHTML = (requests||[]).length ? requests.map(r => '<div class="p-3 bg-slate-50 rounded-lg flex justify-between"><div><p class="font-medium capitalize">' + r.request_type + '</p><p class="text-sm text-slate-500">' + r.request_date + '</p></div><span class="px-3 py-1 rounded-full text-sm ' + (r.status==='pending'?'bg-yellow-100 text-yellow-700':r.status==='approved'?'bg-green-100 text-green-700':'bg-red-100 text-red-700') + '">' + r.status + '</span></div>').join('') : '<p class="text-slate-400">No requests</p>';
-}
-
-async function loadTimeOff() {
-  document.getElementById('vacationBalance').textContent = '10';
-  document.getElementById('sickBalance').textContent = '5';
-  document.getElementById('personalBalance').textContent = '3';
-  const pending = await supabaseFetch('time_requests?user_id=eq.' + currentUser.id + '&status=eq.pending&order=created_at.desc');
-  document.getElementById('pendingRequests').innerHTML = (pending||[]).length ? pending.map(r => '<div class="p-3 bg-slate-50 rounded-lg flex justify-between"><div><p class="font-medium capitalize">' + r.request_type + '</p><p class="text-sm text-slate-500">' + r.request_date + '</p></div><span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm">Pending</span></div>').join('') : '<p class="text-slate-400">No pending requests</p>';
 }
 
 async function loadReport() {
@@ -415,65 +436,54 @@ async function loadReport() {
   let start, end;
   if(period==='today'){ start = today; end = today; }
   else if(period==='week'){ start = new Date(today); start.setDate(today.getDate()-today.getDay()+1); end = new Date(start); end.setDate(start.getDate()+6); }
-  else if(period==='month'){ start = new Date(today.getFullYear(), today.getMonth(), 1); end = new Date(today.getFullYear(), today.getMonth()+1, 0); }
-  else { start = new Date(today.getFullYear(), 0, 1); end = new Date(today.getFullYear(), 11, 31); }
+  else { start = new Date(today.getFullYear(), today.getMonth(), 1); end = new Date(today.getFullYear(), today.getMonth()+1, 0); }
   
   const entries = await supabaseFetch('time_entries?clock_in=gte.' + start.toISOString() + '&clock_in=lte.' + end.toISOString());
   
   const grouped = {};
   (entries||[]).forEach(e => {
-    if(!grouped[e.employee_name]) grouped[e.employee_name] = {work:0, brk:0, overtime:0};
+    if(!grouped[e.employee_name]) grouped[e.employee_name] = {work:0, brk:0};
     if(e.clock_out){
       const ms = new Date(e.clock_out)-new Date(e.clock_in);
       if(e.is_break) grouped[e.employee_name].brk += ms;
-      else { grouped[e.employee_name].work += ms; }
+      else grouped[e.employee_name].work += ms;
     }
   });
   
-  let totalReg = 0, totalOT = 0;
-  document.getElementById('reportBody').innerHTML = Object.entries(grouped).map(([name,data]) => {
-    const reg = Math.min(data.work, 40*3600000);
-    const ot = Math.max(0, data.work - 40*3600000);
-    totalReg += reg; totalOT += ot;
-    return '<tr><td class="px-4 py-3 font-medium">' + name + '</td><td class="px-4 py-3 text-right">' + formatHours(reg) + '</td><td class="px-4 py-3 text-right text-orange-600">' + formatHours(ot) + '</td><td class="px-4 py-3 text-right font-bold">' + formatHours(data.work) + '</td></tr>';
-  }).join('') || '<tr><td colspan="4" class="px-4 py-8 text-center text-slate-400">No data</td></tr>';
-  
-  document.getElementById('reportTotalHours').textContent = formatHours(totalReg + totalOT);
-  document.getElementById('reportRegularHours').textContent = formatHours(totalReg);
-  document.getElementById('reportOvertimeHours').textContent = formatHours(totalOT);
-}
-
-async function loadEmployees() {
-  const employees = await supabaseFetch('users?order=name.asc');
-  document.getElementById('employeesList').innerHTML = (employees||[]).map(e => '<div class="p-4 bg-slate-50 rounded-xl flex items-center gap-4"><div class="w-12 h-12 gradient-bg rounded-full flex items-center justify-center text-white font-bold">' + e.name.charAt(0) + '</div><div class="flex-1"><p class="font-bold">' + e.name + '</p><p class="text-sm text-slate-500">@' + e.username + '</p></div><span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs capitalize">' + e.role + '</span></div>').join('') || '<p class="text-slate-400">No employees</p>';
-}
-
-function showAddEmployee() { document.getElementById('addEmployeeModal').classList.remove('hidden'); document.getElementById('addEmployeeModal').classList.add('flex'); }
-function closeAddEmployee() { document.getElementById('addEmployeeModal').classList.add('hidden'); document.getElementById('addEmployeeModal').classList.remove('flex'); }
-
-async function addEmployee(e) {
-  e.preventDefault();
-  const u = document.getElementById('empUsername').value;
-  const p = document.getElementById('empPassword').value;
-  const n = document.getElementById('empName').value;
-  const r = document.getElementById('empRole').value;
-  await supabasePost('users', {username: u, password: p, name: n, role: r});
-  closeAddEmployee(); loadEmployees();
+  document.getElementById('reportBody').innerHTML = Object.entries(grouped).map(([name,data]) => '<tr><td class="px-4 py-3 font-medium">' + name + '</td><td class="px-4 py-3 text-right">' + formatHours(data.work) + '</td><td class="px-4 py-3 text-right">' + formatHours(data.brk) + '</td></tr>').join('') || '<tr><td colspan="3" class="px-4 py-8 text-center text-slate-400">No data</td></tr>';
 }
 
 function exportCSV() {
-  let csv = 'Employee,Regular Hours,Overtime,Total\n';
+  let csv = 'Employee,Hours,Breaks\n';
   document.querySelectorAll('#reportBody tr').forEach(tr => {
     const cells = tr.querySelectorAll('td');
-    if(cells.length >= 4) csv += cells[0].textContent + ',' + cells[1].textContent + ',' + cells[2].textContent + ',' + cells[3].textContent + '\n';
+    if(cells.length >= 3) csv += cells[0].textContent + ',' + cells[1].textContent + ',' + cells[2].textContent + '\n';
   });
   const blob = new Blob([csv], {type: 'text/csv'});
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'hours_report.csv'; a.click();
 }
 
-function supabaseFetch(q) { return fetch(SUPABASE_URL + '/rest/v1/' + q, {headers:{apikey:SUPABASE_KEY, Authorization:'Bearer ' + SUPABASE_KEY}}).then(r=>r.json()).catch(()=>[]); }
-function supabasePost(t,d) { return fetch(SUPABASE_URL + '/rest/v1/' + t, {method:'POST',headers:{apikey:SUPABASE_KEY, Authorization:'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify(d)}).then(r=>r.json()).catch(()=>({})); }
-function supabasePatch(q,d) { return fetch(SUPABASE_URL + '/rest/v1/' + q, {method:'PATCH',headers:{apikey:SUPABASE_KEY, Authorization:'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify(d)}).then(r=>r.ok ? r.json() : r.text().then(t=>console.error(t))).catch(e=>console.error(e)); }
+function supabaseFetch(q) { 
+  return fetch(SUPABASE_URL + '/rest/v1/' + q, {
+    headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY }
+  }).then(r => r.json()).catch(e => { console.error('Fetch error:', e); return []; }); 
+}
+
+function supabasePost(t,d) { 
+  return fetch(SUPABASE_URL + '/rest/v1/' + t, {
+    method: 'POST',
+    headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer '+SUPABASE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+    body: JSON.stringify(d)
+  }).then(r => r.json()).catch(e => { console.error('Post error:', e); return {}; }); 
+}
+
+function supabasePatch(q,d) { 
+  return fetch(SUPABASE_URL + '/rest/v1/' + q, {
+    method: 'PATCH',
+    headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer '+SUPABASE_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify(d)
+  }).then(r => r.ok ? r.json() : r.text().then(t => console.error('Patch error:', t))).catch(e => console.error('Patch exception:', e)); 
+}
 
 function formatHours(ms) { return Math.floor(ms/3600000) + 'h ' + Math.floor((ms%3600000)/60000) + 'm'; }
 function formatDuration(ms) { return Math.floor(ms/3600000) + 'h ' + Math.floor((ms%3600000)/60000) + 'm'; }
