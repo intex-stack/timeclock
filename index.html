@@ -278,11 +278,11 @@ async function loadTimeClock() {
   console.log('Loading clock for user:', currentUser.id);
   
   // Check for open entry
-  const { data, error } = await supabaseFetch('time_entries?user_id=eq.' + currentUser.id + '&clock_out=is.null&order=clock_in.desc&limit=1');
-  console.log('Open entries:', data, error);
+  const openEntries = await supabaseFetch('time_entries?user_id=eq.' + currentUser.id + '&clock_out=is.null&order=clock_in.desc&limit=1');
+  console.log('Open entries:', openEntries);
   
-  if (data && data.length > 0) { 
-    currentEntry = data[0]; 
+  if (openEntries && openEntries.length > 0) { 
+    currentEntry = openEntries[0]; 
     console.log('Found open entry:', currentEntry);
     updateClockUI(true, currentEntry.is_break); 
     startTimer(currentEntry.clock_in); 
@@ -354,11 +354,11 @@ async function handleClock() {
     console.log('Clock in result:', result);
     
     // Fetch the newly created entry and update UI immediately
-    const { data } = await supabaseFetch('time_entries?user_id=eq.' + currentUser.id + '&clock_out=is.null&order=clock_in.desc&limit=1');
-    console.log('New open entries:', data);
+    const newEntries = await supabaseFetch('time_entries?user_id=eq.' + currentUser.id + '&clock_out=is.null&order=clock_in.desc&limit=1');
+    console.log('New open entries:', newEntries);
     
-    if (data && data.length > 0) { 
-      currentEntry = data[0]; 
+    if (newEntries && newEntries.length > 0) { 
+      currentEntry = newEntries[0]; 
       console.log('Setting currentEntry:', currentEntry);
     }
     
@@ -408,9 +408,9 @@ function startTimer(clockIn) {
 function stopTimer() { if(timerInterval) clearInterval(timerInterval); }
 
 async function loadWhosIn() {
-  const { data } = await supabaseFetch('time_entries?clock_out=is.null&order=clock_in.desc');
+  const whosInData = await supabaseFetch('time_entries?clock_out=is.null&order=clock_in.desc');
   const now = new Date();
-  document.getElementById('whosInList').innerHTML = (data||[]).map(e => {
+  document.getElementById('whosInList').innerHTML = (whosInData||[]).map(e => {
     const elapsed = new Date(now) - new Date(e.clock_in);
     return '<div class="p-4 flex items-center justify-between"><div class="flex items-center gap-4"><div class="w-12 h-12 gradient-bg rounded-full flex items-center justify-center text-white font-bold">' + e.employee_name.charAt(0) + '</div><div><p class="font-bold">' + e.employee_name + '</p><p class="text-sm text-slate-500">In: ' + formatTime(e.clock_in) + '</p></div></div><div class="text-right"><span class="text-xl font-bold text-green-600">' + formatDuration(elapsed) + '</span></div></div>';
   }).join('') || '<div class="p-8 text-center text-slate-400">No one is working</div>';
