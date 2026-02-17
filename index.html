@@ -330,7 +330,9 @@ async function handleClock() {
     // Clock out
     console.log('Clocking out entry:', currentEntry.id);
     await supabasePatch('time_entries?id=eq.' + currentEntry.id, {clock_out: new Date().toISOString()}); 
-    currentEntry = null; stopTimer(); updateClockUI(false,false); 
+    currentEntry = null; 
+    stopTimer(); 
+    updateClockUI(false, false); 
     loadTimeClock();
   } else { 
     // Clock in
@@ -351,8 +353,20 @@ async function handleClock() {
     const result = await supabasePost('time_entries', entryData);
     console.log('Clock in result:', result);
     
-    // Refresh to get the entry
-    await loadTimeClock();
+    // Fetch the newly created entry and update UI immediately
+    const { data } = await supabaseFetch('time_entries?user_id=eq.' + currentUser.id + '&clock_out=is.null&order=clock_in.desc&limit=1');
+    console.log('New open entries:', data);
+    
+    if (data && data.length > 0) { 
+      currentEntry = data[0]; 
+      console.log('Setting currentEntry:', currentEntry);
+    }
+    
+    // Update UI immediately after getting the entry
+    updateClockUI(!!currentEntry, currentEntry?.is_break || false);
+    if (currentEntry) {
+      startTimer(currentEntry.clock_in);
+    }
   }
 }
 
